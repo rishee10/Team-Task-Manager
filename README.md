@@ -3,7 +3,7 @@
 A full-stack Django web application for managing projects, assigning tasks, and tracking team progress with **role-based access control**.
 
 ## 🚀 Live Demo
-> Deploy URL goes here after Railway deployment
+> https://taskmanager-ey0o.onrender.com
 
 ## ✨ Features
 
