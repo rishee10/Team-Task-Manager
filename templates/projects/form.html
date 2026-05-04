@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Project — TaskFlow{% endblock %}
+{% block page_title %}{{ action }} Project{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header">{{ action }} Project</div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Project Name *</label>
+              {{ form.name }}
+              {% if form.name.errors %}<div class="text-danger" style="font-size:0.8rem">{{ form.name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              {{ form.description }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Status</label>
+              {{ form.status }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Priority</label>
+              {{ form.priority }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Start Date</label>
+              {{ form.start_date }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">End Date</label>
+              {{ form.end_date }}
+            </div>
+            <div class="col-12 d-flex gap-2 pt-2">
+              <button type="submit" class="btn btn-primary">{{ action }} Project</button>
+              <a href="{% if project %}{% url 'project_detail' project.pk %}{% else %}{% url 'project_list' %}{% endif %}"
+                 class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}TaskFlow{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #2a2a3d;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43e97b;
+      --text: #e8e8f0;
+      --muted: #7a7a9d;
+      --sidebar-w: 260px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+    h1,h2,h3,h4,h5,h6,.brand { font-family: 'Syne', sans-serif; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+    .brand {
+      padding: 24px 20px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .nav-section { padding: 16px 12px 8px; }
+    .nav-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 8px 8px;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: var(--surface2);
+      color: var(--text);
+    }
+    .nav-link.active { color: var(--accent); }
+    .nav-link .bi { font-size: 1rem; width: 20px; }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--surface2);
+    }
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; color: white;
+      flex-shrink: 0;
+      font-family: 'Syne', sans-serif;
+    }
+    .user-info .name { font-size: 0.85rem; font-weight: 600; }
+    .user-info .role-badge {
+      font-size: 0.65rem;
+      background: var(--accent);
+      color: white;
+      padding: 1px 6px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    /* MAIN */
+    .main-content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .page-title { font-size: 1.2rem; font-weight: 700; }
+    .page-content { padding: 32px; }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--text);
+    }
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+    }
+    .card-body { padding: 20px; }
+
+    /* STAT CARDS */
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .stat-card .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-card .stat-label { color: var(--muted); font-size: 0.85rem; }
+    .stat-card .stat-icon {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-size: 2rem;
+      opacity: 0.15;
+    }
+
+    /* BADGES / PILLS */
+    .badge-status, .badge-priority {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .status-todo { background: #2a2a3d; color: #aaa; }
+    .status-in_progress { background: #1a2a4d; color: #5b9bd5; }
+    .status-review { background: #2d1a4d; color: #b59ae0; }
+    .status-done { background: #1a3d2a; color: #43e97b; }
+    .priority-low { background: #1a3d2a; color: #43e97b; }
+    .priority-medium { background: #2d2a1a; color: #f9ca24; }
+    .priority-high { background: #3d2a1a; color: #f0932b; }
+    .priority-critical { background: #3d1a1a; color: #ff6584; }
+    .project-active { background: #1a3a2a; color: #43e97b; }
+    .project-on_hold { background: #2d2a1a; color: #f9ca24; }
+    .project-completed { background: #1a2a4d; color: #5b9bd5; }
+    .project-archived { background: #2a2a3d; color: #aaa; }
+
+    /* FORMS */
+    .form-control, .form-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+    }
+    .form-control:focus, .form-select:focus {
+      background: var(--surface2);
+      border-color: var(--accent);
+      color: var(--text);
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+    }
+    .form-control::placeholder { color: var(--muted); }
+    .form-label { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+
+    /* BUTTONS */
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      font-weight: 600;
+      border-radius: 10px;
+    }
+    .btn-primary:hover { background: #5a52e0; border-color: #5a52e0; }
+    .btn-outline-primary { border-color: var(--accent); color: var(--accent); border-radius: 10px; }
+    .btn-outline-primary:hover { background: var(--accent); color: white; }
+    .btn-outline-secondary { border-color: var(--border); color: var(--muted); border-radius: 10px; }
+    .btn-outline-secondary:hover { background: var(--surface2); color: var(--text); border-color: var(--border); }
+    .btn-outline-danger { border-radius: 10px; }
+    .btn-sm { font-size: 0.8rem; padding: 5px 12px; }
+
+    /* TABLE */
+    .table { color: var(--text); }
+    .table > :not(caption) > * > * { background: transparent; border-bottom-color: var(--border); padding: 12px 16px; }
+    .table thead th { color: var(--muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+
+    /* ALERTS */
+    .alert {
+      border-radius: 12px;
+      border: none;
+      font-size: 0.9rem;
+    }
+    .alert-success { background: #1a3d2a; color: #43e97b; }
+    .alert-danger { background: #3d1a1a; color: #ff8fa3; }
+    .alert-warning { background: #2d2a1a; color: #f9ca24; }
+    .alert-info { background: #1a2a4d; color: #74b9ff; }
+
+    /* PROGRESS */
+    .progress {
+      background: var(--surface2);
+      border-radius: 20px;
+      height: 8px;
+    }
+    .progress-bar { border-radius: 20px; }
+
+    /* OVERDUE */
+    .overdue-badge { color: var(--accent2); }
+
+    /* TASK ROW */
+    .task-row { transition: background 0.15s; }
+    .task-row:hover { background: var(--surface2) !important; }
+
+    /* PROJECT CARD */
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: transform 0.2s, border-color 0.2s;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+    }
+    .project-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .project-card h5 { font-family: 'Syne', sans-serif; font-weight: 700; }
+
+    /* AUTH */
+    .auth-wrapper {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      background-image: radial-gradient(ellipse at 20% 50%, rgba(108,99,255,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(255,101,132,0.06) 0%, transparent 60%);
+    }
+    .auth-box {
+      width: 100%;
+      max-width: 460px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* MISC */
+    .text-muted { color: var(--muted) !important; }
+    .border-top { border-color: var(--border) !important; }
+    .bg-surface2 { background: var(--surface2); }
+    .dropdown-menu {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .dropdown-item { color: var(--text); }
+    .dropdown-item:hover { background: var(--surface2); color: var(--text); }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .page-content { padding: 16px; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% block full_page %}
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      TaskFlow
+    </div>
+    <nav class="nav-section">
+      <div class="nav-label">Navigation</div>
+      <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+      <a href="{% url 'project_list' %}" class="nav-link {% if 'project' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-folder2-open"></i> Projects
+      </a>
+      <a href="{% url 'my_tasks' %}" class="nav-link {% if request.resolver_match.url_name == 'my_tasks' %}active{% endif %}">
+        <i class="bi bi-check2-square"></i> My Tasks
+      </a>
+      {% if user.is_admin %}
+      <div class="nav-label mt-3">Admin</div>
+      <a href="{% url 'members' %}" class="nav-link {% if request.resolver_match.url_name == 'members' %}active{% endif %}">
+        <i class="bi bi-people-fill"></i> Members
+      </a>
+      <a href="/admin/" class="nav-link">
+        <i class="bi bi-gear-fill"></i> Admin Panel
+      </a>
+      {% endif %}
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar">{{ user.initials }}</div>
+        <div class="user-info">
+          <div class="name">{{ user.full_name }}</div>
+          <span class="role-badge">{{ user.role }}</span>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-sm flex-fill text-center">
+          <i class="bi bi-person"></i> Profile
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm flex-fill text-center">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="page-title">{% block page_title %}{% endblock %}</div>
+      <div class="d-flex gap-2">{% block topbar_actions %}{% endblock %}</div>
+    </div>
+    <div class="page-content">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

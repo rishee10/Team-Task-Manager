@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}{{ task.title }} — TaskFlow{% endblock %}
+{% block page_title %}Task Detail{% endblock %}
+{% block topbar_actions %}
+  {% if can_edit %}
+  <a href="{% url 'task_edit' task.pk %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+  <a href="{% url 'task_delete' task.pk %}" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h3 style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:12px">
+          {{ task.title }}
+          {% if task.is_overdue %}<span class="overdue-badge" style="font-size:0.9rem;font-weight:400"> ⚠ Overdue</span>{% endif %}
+        </h3>
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+          <span class="badge-status status-{{ task.status }}">{{ task.get_status_display }}</span>
+          <span class="badge-priority priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+          <a href="{% url 'project_detail' task.project.pk %}" style="font-size:0.8rem;color:var(--muted);text-decoration:none">
+            <i class="bi bi-folder2 me-1"></i>{{ task.project.name }}
+          </a>
+        </div>
+        {% if task.description %}
+        <p style="color:var(--text);font-size:0.9rem;line-height:1.7">{{ task.description }}</p>
+        {% else %}
+        <p style="color:var(--muted);font-style:italic;font-size:0.875rem">No description provided.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="card">
+      <div class="card-header">Comments ({{ comments.count }})</div>
+      <div class="card-body p-0">
+        {% for comment in comments %}
+        <div class="px-4 py-3" style="border-bottom:1px solid var(--border)">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="avatar" style="width:28px;height:28px;font-size:0.65rem;border-radius:7px">{{ comment.author.initials }}</div>
+              <span style="font-weight:600;font-size:0.875rem">{{ comment.author.full_name }}</span>
+              <span style="color:var(--muted);font-size:0.78rem">{{ comment.created_at|timesince }} ago</span>
+            </div>
+            {% if comment.author == request.user or request.user.is_admin %}
+            <a href="{% url 'delete_comment' comment.pk %}" style="color:var(--accent2);font-size:0.8rem"
+               onclick="return confirm('Delete this comment?')"><i class="bi bi-x-lg"></i></a>
+            {% endif %}
+          </div>
+          <p style="color:var(--text);font-size:0.875rem;margin:0;padding-left:36px">{{ comment.content }}</p>
+        </div>
+        {% empty %}
+        <div class="text-center py-4 text-muted">
+          <i class="bi bi-chat" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:0.4"></i>
+          No comments yet.
+        </div>
+        {% endfor %}
+
+        <div class="p-4">
+          <form method="post">
+            {% csrf_token %}
+            {{ comment_form.content }}
+            <button type="submit" name="comment_submit" class="btn btn-primary btn-sm mt-2">Post Comment</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Task Info</div>
+      <div class="card-body">
+        <div class="mb-3">
+          <div style="color:var(--muted);font-size:0.75rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px">Assigned To</div>
+          {% if task.assigned_to %}
+          <div class="d-flex align-items-center gap-2">
+            <div class="avatar" style="width:28px;height:28px;font-size:0.65rem;border-radius:7px">{{ task.assigned_to.initials }}</div>
+            <span style="font-size:0.875rem">{{ task.assigned_to.full_name }}</span>
+          </div>
+          {% else %}<span style="color:var(--muted);font-size:0.875rem">Unassigned</span>{% endif %}
+        </div>
+        <div class="mb-3">
+          <div style="color:var(--muted);font-size:0.75rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px">Created By</div>
+          <span style="font-size:0.875rem">{{ task.created_by.full_name }}</span>
+        </div>
+        <div class="mb-3">
+          <div style="color:var(--muted);font-size:0.75rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px">Due Date</div>
+          <span style="font-size:0.875rem;color:{% if task.is_overdue %}var(--accent2){% else %}var(--text){% endif %}">
+            {% if task.due_date %}{{ task.due_date|date:"M d, Y H:i" }}{% else %}Not set{% endif %}
+          </span>
+        </div>
+        <div class="mb-3">
+          <div style="color:var(--muted);font-size:0.75rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px">Created</div>
+          <span style="font-size:0.875rem">{{ task.created_at|date:"M d, Y" }}</span>
+        </div>
+        {% if task.completed_at %}
+        <div class="mb-3">
+          <div style="color:var(--muted);font-size:0.75rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px">Completed</div>
+          <span style="font-size:0.875rem;color:var(--accent3)">{{ task.completed_at|date:"M d, Y" }}</span>
+        </div>
+        {% endif %}
+
+        {% if can_edit %}
+        <div class="mt-4 pt-3" style="border-top:1px solid var(--border)">
+          <div style="color:var(--muted);font-size:0.75rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px">Update Status</div>
+          <form method="post" action="{% url 'task_status' task.pk %}" id="status-form">
+            {% csrf_token %}
+            <select name="status" class="form-select form-select-sm mb-2" id="status-sel">
+              {% for val, label in task.STATUS_CHOICES %}
+              <option value="{{ val }}" {% if task.status == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-outline-primary btn-sm w-100">Update</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('status-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const resp = await fetch(this.action, {method:'POST', body: formData});
+  const data = await resp.json();
+  if (data.success) {
+    location.reload();
+  }
+});
+</script>
+{% endblock %}

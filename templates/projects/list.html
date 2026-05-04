@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Projects — TaskFlow{% endblock %}
+{% block page_title %}Projects{% endblock %}
+{% block topbar_actions %}
+  {% if user.is_admin %}
+  <a href="{% url 'project_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Project</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="d-flex gap-2 mb-4 flex-wrap">
+  <form method="get" class="d-flex gap-2 flex-wrap">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search projects..." class="form-control" style="max-width:200px;font-size:0.875rem">
+    <select name="status" class="form-select" style="max-width:140px;font-size:0.875rem" onchange="this.form.submit()">
+      <option value="">All Status</option>
+      <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+      <option value="on_hold" {% if status_filter == 'on_hold' %}selected{% endif %}>On Hold</option>
+      <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+      <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
+    </select>
+    <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-search"></i></button>
+    {% if q or status_filter %}<a href="{% url 'project_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>{% endif %}
+  </form>
+</div>
+
+{% if projects %}
+<div class="row g-4">
+  {% for project in projects %}
+  <div class="col-md-6 col-xl-4">
+    <a href="{% url 'project_detail' project.pk %}" class="project-card h-100" style="display:flex;flex-direction:column">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <h5 class="mb-0">{{ project.name }}</h5>
+        <span class="badge-status project-{{ project.status }}">{{ project.get_status_display }}</span>
+      </div>
+      {% if project.description %}
+      <p style="color:var(--muted);font-size:0.875rem;margin-bottom:16px;flex:1">{{ project.description|truncatechars:80 }}</p>
+      {% endif %}
+      <div class="mt-auto">
+        <div class="d-flex justify-content-between mb-1" style="font-size:0.78rem;color:var(--muted)">
+          <span>Progress</span>
+          <span>{{ project.progress }}%</span>
+        </div>
+        <div class="progress mb-3">
+          <div class="progress-bar" style="width:{{ project.progress }}%;background:var(--accent)"></div>
+        </div>
+        <div class="d-flex justify-content-between" style="font-size:0.8rem;color:var(--muted)">
+          <span><i class="bi bi-check2-square me-1"></i>{{ project.completed_tasks }}/{{ project.task_count }} tasks</span>
+          <span><i class="bi bi-people me-1"></i>{{ project.member_count }} members</span>
+          <span class="badge-priority priority-{{ project.priority }}">{{ project.get_priority_display }}</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5" style="color:var(--muted)">
+  <i class="bi bi-folder2-open" style="font-size:3rem;display:block;margin-bottom:16px;opacity:0.4"></i>
+  <h4 style="font-family:'Syne',sans-serif">No projects found</h4>
+  <p>{% if user.is_admin %}Create your first project to get started.{% else %}You haven't been added to any projects yet.{% endif %}</p>
+  {% if user.is_admin %}<a href="{% url 'project_create' %}" class="btn btn-primary mt-2">Create Project</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

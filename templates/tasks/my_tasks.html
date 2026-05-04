@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}My Tasks — TaskFlow{% endblock %}
+{% block page_title %}My Tasks{% endblock %}
+
+{% block content %}
+<div class="d-flex gap-2 mb-4">
+  <form method="get" class="d-flex gap-2">
+    <select name="status" class="form-select form-select-sm" style="max-width:140px" onchange="this.form.submit()">
+      <option value="">All Status</option>
+      <option value="todo" {% if status_filter == 'todo' %}selected{% endif %}>To Do</option>
+      <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+      <option value="review" {% if status_filter == 'review' %}selected{% endif %}>In Review</option>
+      <option value="done" {% if status_filter == 'done' %}selected{% endif %}>Done</option>
+    </select>
+    {% if status_filter %}<a href="{% url 'my_tasks' %}" class="btn btn-outline-secondary btn-sm">Clear</a>{% endif %}
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header">Assigned to Me ({{ tasks|length }})</div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr>
+        <th>Task</th><th>Project</th><th>Status</th><th>Priority</th><th>Due</th><th></th>
+      </tr></thead>
+      <tbody>
+      {% for task in tasks %}
+      <tr class="task-row">
+        <td>
+          <a href="{% url 'task_detail' task.pk %}" style="color:var(--text);text-decoration:none;font-weight:500">
+            {{ task.title|truncatechars:50 }}
+          </a>
+          {% if task.is_overdue %}<i class="bi bi-exclamation-circle-fill overdue-badge ms-1" title="Overdue"></i>{% endif %}
+        </td>
+        <td style="color:var(--muted);font-size:0.85rem">
+          <a href="{% url 'project_detail' task.project.pk %}" style="color:var(--muted);text-decoration:none">{{ task.project.name }}</a>
+        </td>
+        <td><span class="badge-status status-{{ task.status }}">{{ task.get_status_display }}</span></td>
+        <td><span class="badge-priority priority-{{ task.priority }}">{{ task.get_priority_display }}</span></td>
+        <td style="font-size:0.82rem;color:{% if task.is_overdue %}var(--accent2){% else %}var(--muted){% endif %}">
+          {% if task.due_date %}{{ task.due_date|date:"M d, H:i" }}{% else %}—{% endif %}
+        </td>
+        <td>
+          <a href="{% url 'task_detail' task.pk %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-eye"></i></a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-center text-muted py-5">
+        <i class="bi bi-check2-all" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.4"></i>
+        No tasks assigned to you.
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Login — TaskFlow{% endblock %}
+
+{% block full_page %}
+<div class="auth-wrapper">
+  <div class="auth-box">
+    <div class="text-center mb-4">
+      <div style="width:52px;height:52px;background:linear-gradient(135deg,#6c63ff,#ff6584);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px">⚡</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800">Welcome back</h2>
+      <p style="color:var(--muted);font-size:0.9rem">Sign in to your TaskFlow account</p>
+    </div>
+
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+    {% endfor %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        {{ form.username }}
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Password</label>
+        {{ form.password }}
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2">Sign In</button>
+    </form>
+
+    <div class="text-center mt-4" style="color:var(--muted);font-size:0.9rem">
+      Don't have an account? <a href="{% url 'signup' %}" style="color:var(--accent)">Sign up</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

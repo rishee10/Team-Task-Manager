@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Task — TaskFlow{% endblock %}
+{% block page_title %}{{ action }} Task{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header">
+        {{ action }} Task
+        {% if project %}<span style="color:var(--muted);font-weight:400;font-size:0.875rem"> — {{ project.name }}</span>{% endif %}
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Title *</label>
+              {{ form.title }}
+              {% if form.title.errors %}<div class="text-danger" style="font-size:0.8rem">{{ form.title.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              {{ form.description }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Assigned To</label>
+              {{ form.assigned_to }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Status</label>
+              {{ form.status }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Priority</label>
+              {{ form.priority }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Due Date</label>
+              {{ form.due_date }}
+            </div>
+            <div class="col-12 d-flex gap-2 pt-2">
+              <button type="submit" class="btn btn-primary">{{ action }} Task</button>
+              {% if task %}
+              <a href="{% url 'task_detail' task.pk %}" class="btn btn-outline-secondary">Cancel</a>
+              {% elif project %}
+              <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline-secondary">Cancel</a>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
