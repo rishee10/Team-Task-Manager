@@ -96,19 +96,6 @@ python manage.py runserver
 
 Open http://127.0.0.1:8000
 
-## 🚂 Deploy to Railway
-
-1. Push your code to GitHub
-2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
-3. Add a **PostgreSQL** service to the project
-4. Set these environment variables in Railway:
-   ```
-   SECRET_KEY=your-secure-secret-key
-   DEBUG=False
-   ALLOWED_HOSTS=your-app.railway.app
-   DATABASE_URL=<auto-set by Railway PostgreSQL plugin>
-   ```
-5. Railway auto-detects the Procfile and runs migrations + collectstatic on deploy
 
 ## 🔐 Role System
 
